@@ -1,0 +1,60 @@
+import express from "express";
+import z, { number } from 'zod';
+import { prismaClient } from "./db";
+
+export const app = express();
+app.use(express.json());
+
+
+
+const sunInput = z.object({
+    a: z.number(),
+    b:z.number()
+})
+
+//@ts-ignore
+app.post("/sum", async (req, res) => {
+    const parsedResponse = sunInput.safeParse(req.body)
+    
+    if (!parsedResponse.success) {
+        return res.status(411).json({
+            message: "Incorrect inputs"
+        })
+    }
+
+    const answer = parsedResponse.data.a + parsedResponse.data.b;
+
+    await prismaClient.sum.create({
+        data: {
+            a: parsedResponse.data.a,
+            b: parsedResponse.data.b,
+            result: answer
+        }
+    })
+
+    res.json({
+        answer
+    })
+});
+
+
+app.get("/sum", (req, res)=>{
+    const parsedResponse = sunInput.safeParse({
+        a:Number(req.headers["a"]),
+        b:Number(req.headers["b"])
+    })
+
+    if (!parsedResponse.success){
+        res.status(411).json({
+            message : "Invalid Input"
+        })
+
+    }
+    //@ts-ignore
+    const ans = parsedResponse.data.a + parsedResponse.data.b ;
+
+
+    res.json({
+        ans
+    })
+})
