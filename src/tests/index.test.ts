@@ -20,6 +20,6 @@ describe("POST /sum", ()=>{
             b:2
         })
         expect (res.statusCode).toBe(200);
-        expect (res.body.ans).toBe(3);
+        expect (res.body.answer).toBe(3);
     })
 })
